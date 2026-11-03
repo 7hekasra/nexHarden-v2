@@ -226,7 +226,7 @@ If the problem persists, save the complete error output for further investigatio
 | Specification | Details |
 |---|---|
 | Project Name | nexHarden |
-| Version | 1.0.0 |
+| Version | 2.0 |
 | Programming Language | Python |
 | Operating System | Linux |
 | Minimum Python Version | 3.9 |
@@ -251,5 +251,3 @@ If you are passionate about Linux, cybersecurity, and open-source software, we i
 ---
 
 **nexHarden — Security through Knowledge.**
-
-<sub>Built with ❤️ for the Linux & Open Source Community</sub>
