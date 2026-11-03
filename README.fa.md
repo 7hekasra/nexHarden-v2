@@ -193,7 +193,7 @@ sudo ./nexharden audit --full
 مطمئن شوید در پوشه اصلی پروژه قرار دارید:
 
 ```bash
-cd ~/Downloads/nexHarden-1.0.0/nexHarden
+cd ~/Downloads/nexHarden-v2/nexHarden
 ```
 
 سپس برنامه را دوباره اجرا کنید:
