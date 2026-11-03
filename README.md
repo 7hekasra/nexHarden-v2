@@ -1,248 +1,186 @@
-# 🛡️ nexHarden
+# nexHarden 1.0.0
 
-### Linux Security Auditing & Hardening Tool
+**Linux Security Auditing & Hardening Framework**
 
-**nexHarden** یک ابزار متن‌باز و سبک برای بررسی امنیت سیستم‌های لینوکسی و شناسایی تنظیمات امنیتی ضعیف است.
+nexHarden is a modular, safety-first toolkit for auditing Linux systems, identifying configuration weaknesses, generating professional reports, and applying carefully controlled hardening changes with full backup and rollback support.
 
-این ابزار سیستم شما را بررسی می‌کند، مشکلات احتمالی امنیتی را شناسایی می‌کند و گزارشی خوانا همراه با پیشنهادهایی برای بهبود امنیت ارائه می‌دهد.
+> Configuration Compliance Score is an indicator only. A high score does **not** mean the system is secure.
 
-هدف nexHarden ساده است: **امنیت لینوکس را قابل‌فهم‌تر، دسترس‌پذیرتر و آسان‌تر کند.**
+## Features
 
----
+- Read-only security auditing across 11 modules
+- Transparent configuration compliance scoring
+- Three hardening profiles: basic, standard, strict
+- Dry-run by default; explicit approval required for changes
+- Timestamped backups and verified rollback
+- Self-contained HTML dashboard (no CDN, works offline)
+- JSON reports for automation
+- Local audit history
+- Minimal dependencies (Python 3 standard library)
 
-## ✨ قابلیت‌ها
+## Supported Platforms
 
-- 🔍 **Security Audit:** بررسی تنظیمات امنیتی سیستم لینوکس
-- 📊 **Security Reports:** تولید گزارش‌های HTML و JSON
-- 🛡️ **Hardening Profiles:** ارائه پیشنهادهای امنیتی برای سخت‌سازی سیستم
-- 🧪 **Dry Run:** مشاهده تغییرات پیشنهادی پیش از اعمال آن‌ها
-- 📚 **Audit History:** دسترسی به گزارش‌های بررسی قبلی
-- ⚡ **Lightweight:** بدون نیاز به نصب پیچیده و وابستگی‌های غیرضروری
+Primary support:
 
-## 📦 نصب و راه‌اندازی
+| Distribution | Versions   | Architecture   |
+|--------------|------------|----------------|
+| Debian       | 12, 13     | x86_64, ARM64  |
+| Ubuntu       | 22.04, 24.04 LTS | x86_64, ARM64 |
 
-### ۱. دریافت و استخراج برنامه
+Other Debian/Ubuntu derivatives may work with warnings. Non-APT systems receive limited package checks.
 
-فایل فشرده nexHarden را دانلود و استخراج کنید:
+## Requirements
+
+- Python 3.9+
+- Standard Linux utilities (`sysctl`, `ss`/`netstat`, `systemctl` on systemd systems)
+- Root privileges only for privileged checks and hardening (audit works partially without root)
+
+No mandatory pip packages.
+
+## Installation
 
 ```bash
 unzip nexHarden-1.0.0.zip
 cd nexHarden
+chmod +x nexharden harden.sh
 ```
 
-### ۲. دسترسی اجرا
+Optional: place the directory on `PATH` or create a symlink.
+
+## Quick Start
 
 ```bash
-chmod +x nexharden
-```
+# System detection
+./nexharden system-info
 
-همین! برنامه آماده اجراست و به نصب جداگانه نیاز ندارد.
-
-> **پیش‌نیاز:** Python 3.9 یا بالاتر.
-
----
-
-## 🚀 شروع سریع
-
-برای شروع، کافی است دستور زیر را اجرا کنید:
-
-```bash
+# Read-only audit (JSON + HTML reports)
 ./nexharden audit
-```
 
-این دستور بررسی اولیه امنیت سیستم را انجام می‌دهد.
-
-برای انجام بررسی کامل‌تر، از دستور زیر استفاده کنید:
-
-```bash
+# Full audit with all modules
 sudo ./nexharden audit --full
-```
 
-پس از پایان بررسی، گزارش امنیتی تولید خواهد شد.
+# Specific module
+./nexharden audit --module ssh
 
-## 📊 مشاهده گزارش‌ها
-
-تمام گزارش‌های تولیدشده در پوشه `reports` ذخیره می‌شوند.
-
-گزارش‌ها در قالب HTML و JSON در دسترس هستند.
-
-برای مشاهده گزارش HTML:
-
-```bash
-xdg-open reports/audit-*.html
-```
-
-در صورت کار نکردن دستور بالا، می‌توانید مستقیماً از مرورگر استفاده کنید:
-
-```bash
-firefox reports/audit-*.html
-```
-
-یا:
-
-```bash
-google-chrome reports/audit-*.html
-```
-
-### اگر گزارش باز نشد چه کار کنیم؟
-
-اگر با خطای `ERR_ACCESS_DENIED` مواجه شدید، احتمالاً مشکل از مجوز دسترسی فایل است.
-
-ابتدا مالکیت پوشه گزارش‌ها را اصلاح کنید:
-
-```bash
-sudo chown -R "$USER":"$USER" reports/
-```
-
-سپس مجوز خواندن فایل‌ها را تنظیم کنید:
-
-```bash
-chmod 644 reports/*.html reports/*.json
-```
-
-حالا دوباره گزارش را باز کنید.
-
-**روش جایگزین:**
-
-اگر همچنان مشکل داشتید، یک وب‌سرور محلی ساده اجرا کنید:
-
-```bash
-cd reports
-python3 -m http.server 8080
-```
-
-سپس آدرس زیر را در مرورگر باز کنید:
-
-```text
-http://localhost:8080
-```
-
-برای متوقف کردن وب‌سرور، `Ctrl + C` را فشار دهید.
-
----
-
-## 🛠️ دستورات کاربردی
-
-| دستور | عملکرد |
-|---|---|
-| `./nexharden audit` | بررسی اولیه امنیت سیستم |
-| `sudo ./nexharden audit --full` | بررسی کامل‌تر امنیت |
-| `./nexharden system-info` | نمایش اطلاعات سیستم |
-| `./nexharden version` | نمایش نسخه برنامه |
-| `./nexharden history` | مشاهده گزارش‌های قبلی |
-
----
-
-## 🔐 Hardening چیست؟
-
-Hardening یا سخت‌سازی، به مجموعه اقداماتی گفته می‌شود که با هدف کاهش آسیب‌پذیری‌ها و افزایش امنیت سیستم انجام می‌شوند.
-
-nexHarden علاوه بر شناسایی مشکلات، می‌تواند پیشنهادهایی برای بهبود تنظیمات امنیتی سیستم ارائه دهد.
-
-این قابلیت به‌صورت پیش‌فرض هیچ تغییری در سیستم ایجاد نمی‌کند.
-
-### ۱. مشاهده تغییرات پیشنهادی (Dry Run)
-
-پیش از اعمال هرگونه تغییر، می‌توانید نتیجه احتمالی را مشاهده کنید:
-
-```bash
+# Preview hardening (dry-run)
 sudo ./nexharden harden --profile basic --dry-run
-```
 
-### ۲. اعمال تغییرات (Apply)
-
-در صورت بررسی و تأیید پیشنهادها، می‌توانید آن‌ها را اعمال کنید:
-
-```bash
+# Apply hardening (interactive confirmation)
 sudo ./nexharden harden --profile basic --apply
 ```
 
-> **توجه:** پیش از اعمال تغییرات، خروجی Dry Run را به‌دقت بررسی کنید. تغییر تنظیمات امنیتی ممکن است روی عملکرد برخی سرویس‌ها و برنامه‌ها تأثیر بگذارد.
+Reports are written to `reports/`.
 
----
+## CLI Commands
 
-## 🧰 مشکلات رایج
+| Command | Description |
+|---------|-------------|
+| `audit` | Run security audit |
+| `harden --profile NAME` | Preview or apply a profile |
+| `backup list` | List hardening transactions |
+| `rollback --transaction ID` | Restore a previous transaction |
+| `history` | Show past audit summaries |
+| `system-info` | Print detected system details |
+| `version` | Print version |
 
-### برنامه اجرا نمی‌شود
+### Audit options
 
-ابتدا نسخه پایتون را بررسی کنید:
+- `--full` — include all modules
+- `--module ssh,firewall` — run selected modules
+- `--report html,json` — choose output formats
+
+### Hardening options
+
+- `--profile basic|standard|strict`
+- `--dry-run` (default behavior when `--apply` is omitted)
+- `--apply` — perform changes after confirmation
+- `--yes` — skip interactive prompt (still creates backups; does not bypass SSH/firewall safety design)
+
+## Audit Workflow
+
+1. Detect distribution, kernel, firewall, SSH, privileges.
+2. Execute selected modules (read-only).
+3. Classify findings (PASS / FAIL / WARNING / UNKNOWN / N/A).
+4. Compute weighted compliance score (UNKNOWN/N/A excluded).
+5. Write JSON and HTML reports.
+6. Store summary in local history.
+
+## Hardening Workflow
+
+1. Load profile and resolve inheritance.
+2. Compare current values to targets.
+3. Display dry-run plan.
+4. On `--apply`, require explicit confirmation.
+5. Create timestamped transaction backup.
+6. Apply minimal changes (currently runtime sysctl).
+7. Record results and transaction ID.
+8. Re-audit recommended after changes.
+
+**Important:** SSH and firewall rule changes are intentionally **not** auto-applied in 1.0.0. They are audited with recommendations only. Automatic modification of `sshd_config` or firewall policies requires additional recovery guarantees planned for future releases.
+
+## Backup & Rollback
 
 ```bash
-python3 --version
+sudo ./nexharden backup list
+sudo ./nexharden rollback --transaction TRANSACTION_ID
 ```
 
-در صورت نصب نبودن Python:
+Rollback verifies that files still match the post-hardening state before restoring. Unexpected user modifications cause the restore to be refused.
 
-```bash
-sudo apt update
-sudo apt install python3
+## Project Structure
+
+```
+nexHarden/
+├── nexharden          # CLI entry point
+├── harden.sh          # Bash launcher
+├── core/              # Engine, scoring, backup, reporter
+├── modules/           # Audit modules
+├── profiles/          # basic, standard, strict
+├── dashboard/         # HTML/CSS/JS template
+├── tests/             # Automated tests
+├── reports/           # Generated reports
+├── backups/           # Transaction backups
+├── history/           # Audit history
+└── docs/
 ```
 
-### خطای Permission Denied
+## Scoring Formula
 
-برخی بررسی‌ها برای دسترسی به اطلاعات سیستمی به مجوز مدیر نیاز دارند:
-
-```bash
-sudo ./nexharden audit --full
+```
+Score = (sum of weights of PASS checks) / (sum of weights of PASS + FAIL checks) × 100
 ```
 
-### خطای Module Not Found
+Weights: CRITICAL=10, HIGH=5, MEDIUM=2, LOW=1. WARNING awards 0 points. UNKNOWN and N/A are excluded from the denominator.
 
-مطمئن شوید در پوشه اصلی پروژه قرار دارید:
+## Limitations (1.0.0)
 
-```bash
-cd ~/Downloads/nexHarden-1.0.0/nexHarden
-```
+- Hardening currently applies **sysctl** settings only.
+- SSH configuration and firewall rules are audited but not automatically modified.
+- PAM changes are not applied automatically.
+- Package upgrades are never performed by the tool.
+- Desktop vs server heuristics are approximate.
+- Not all kernel parameters exist on every kernel; missing ones are marked N/A.
 
-سپس برنامه را دوباره اجرا کنید:
+## Security Warnings
 
-```bash
-./nexharden audit
-```
+- Always review dry-run output before applying.
+- Keep an alternate access path when hardening remote systems.
+- Reports must be treated as sensitive (file permissions 0600).
+- This tool does not replace a full security assessment, intrusion detection, or patch management process.
 
-اگر مشکل همچنان وجود داشت، خروجی کامل خطا را برای بررسی نگه دارید.
+## Troubleshooting
 
----
+| Issue | Suggestion |
+|-------|------------|
+| `sshd -T` fails | Install `openssh-server` or run without SSH module |
+| Incomplete user checks | Re-run with `sudo` |
+| No HTML styling | Ensure `dashboard/` is present next to the CLI |
+| Permission denied on reports | Check directory ownership |
 
-## ⚠️ نکات امنیتی مهم
+## License
 
-- nexHarden یک ابزار بررسی و سخت‌سازی امنیتی است، نه جایگزین آنتی‌ویروس یا فایروال.
-- نتیجه بررسی، تضمینی برای امن بودن کامل سیستم نیست.
-- پیش از اعمال تغییرات، حتماً خروجی Dry Run را بررسی کنید.
-- پیشنهادهای امنیتی ممکن است با توجه به توزیع لینوکس و نوع استفاده از سیستم متفاوت باشند.
-- گزارش‌ها ممکن است شامل اطلاعات حساس سیستم باشند؛ از انتشار عمومی آن‌ها خودداری کنید.
-- بهتر است پیش از اعمال تغییرات مهم، از تنظیمات و فایل‌های ضروری خود نسخه پشتیبان تهیه کنید.
+MIT License — see `LICENSE`.
 
----
+## Version
 
-## 📋 اطلاعات پروژه
-
-| مشخصات | مقدار |
-|---|---|
-| نام پروژه | nexHarden |
-| نسخه | 2 |
-| زبان برنامه‌نویسی | Python |
-| سیستم‌عامل | Linux |
-| حداقل نسخه Python | 3.9 |
-| مجوز | MIT |
-
----
-
-## 🐧 درباره نرم‌افزار آزاد
-
-ما باور داریم امنیت نباید یک قابلیت انحصاری یا محدود به گروه خاصی از کاربران باشد.
-
-نرم‌افزار آزاد به ما این فرصت را می‌دهد که کد را بررسی کنیم، از آن یاد بگیریم، تغییرش دهیم و در بهتر شدنش سهیم باشیم.
-
-**nexHarden با همین باور ساخته شده است.**
-
-این پروژه تلاشی کوچک برای ساختن دنیایی است که در آن دانش آزادانه به اشتراک گذاشته می‌شود، ابزارها در دسترس همه هستند و امنیت با همکاری جامعه رشد می‌کند.
-
-اگر به لینوکس، امنیت سایبری و نرم‌افزار آزاد علاقه‌مند هستید، از شما دعوت می‌کنیم در توسعه این پروژه همراه ما باشید.
-
-**آزادانه استفاده کنید، یاد بگیرید، بهبود دهید و به اشتراک بگذارید.**
-
----
-
-**nexHarden — Security through Knowledge.**
-
+1.0.0
