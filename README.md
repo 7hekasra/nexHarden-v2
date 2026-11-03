@@ -1,5 +1,7 @@
 # nexHarden 1.0.0
+[🇮🇷 فارسی](README.fa.md) | [🇬🇧 English](README.md)
 
+# 🛡️ nexHarden
 **Linux Security Auditing & Hardening Framework**
 
 nexHarden is a modular, safety-first toolkit for auditing Linux systems, identifying configuration weaknesses, generating professional reports, and applying carefully controlled hardening changes with full backup and rollback support.
