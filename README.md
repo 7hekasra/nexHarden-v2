@@ -28,7 +28,7 @@ The goal of nexHarden is simple: **to make Linux security more understandable, a
 Download the nexHarden archive and extract it:
 
 ```bash
-unzip nexHarden-1.0.0.zip
+unzip nexHarden-v2.zip
 cd nexHarden
 ```
 
