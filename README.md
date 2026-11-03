@@ -1,188 +1,255 @@
-# 🛡️ nexHarden
-
 [🇮🇷 فارسی](README.fa.md) | [🇬🇧 English](README.md)
 
-**Linux Security Auditing & Hardening Framework**
+# 🛡️ nexHarden
 
-nexHarden is a modular, safety-first toolkit for auditing Linux systems, identifying configuration weaknesses, generating professional reports, and applying carefully controlled hardening changes with full backup and rollback support.
+### Linux Security Auditing & Hardening Tool
 
-> Configuration Compliance Score is an indicator only. A high score does **not** mean the system is secure.
+**nexHarden** is a lightweight, open-source tool designed to audit Linux systems and identify potentially insecure configurations.
 
-## Features
+It examines your system, detects potential security issues, and generates easy-to-understand reports with recommendations to improve your system's security.
 
-- Read-only security auditing across 11 modules
-- Transparent configuration compliance scoring
-- Three hardening profiles: basic, standard, strict
-- Dry-run by default; explicit approval required for changes
-- Timestamped backups and verified rollback
-- Self-contained HTML dashboard (no CDN, works offline)
-- JSON reports for automation
-- Local audit history
-- Minimal dependencies (Python 3 standard library)
+The goal of nexHarden is simple: **to make Linux security more understandable, accessible, and easier to manage.**
 
-## Supported Platforms
+---
 
-Primary support:
+## ✨ Features
 
-| Distribution | Versions   | Architecture   |
-|--------------|------------|----------------|
-| Debian       | 12, 13     | x86_64, ARM64  |
-| Ubuntu       | 22.04, 24.04 LTS | x86_64, ARM64 |
+- 🔍 **Security Audit:** Examine Linux system security configurations.
+- 📊 **Security Reports:** Generate detailed HTML and JSON reports.
+- 🛡️ **Hardening Profiles:** Provide security recommendations to harden your system.
+- 🧪 **Dry Run:** Preview proposed changes before applying them.
+- 📚 **Audit History:** Access previously generated audit reports.
+- ⚡ **Lightweight:** No complicated installation or unnecessary dependencies.
 
-Other Debian/Ubuntu derivatives may work with warnings. Non-APT systems receive limited package checks.
+## 📦 Installation
 
-## Requirements
+### 1. Download and Extract
 
-- Python 3.9+
-- Standard Linux utilities (`sysctl`, `ss`/`netstat`, `systemctl` on systemd systems)
-- Root privileges only for privileged checks and hardening (audit works partially without root)
-
-No mandatory pip packages.
-
-## Installation
+Download the nexHarden archive and extract it:
 
 ```bash
 unzip nexHarden-1.0.0.zip
 cd nexHarden
-chmod +x nexharden harden.sh
 ```
 
-Optional: place the directory on `PATH` or create a symlink.
-
-## Quick Start
+### 2. Make the Program Executable
 
 ```bash
-# System detection
-./nexharden system-info
+chmod +x nexharden
+```
 
-# Read-only audit (JSON + HTML reports)
+That's it! nexHarden is ready to use without any complicated installation process.
+
+> **Requirement:** Python 3.9 or later.
+
+---
+
+## 🚀 Quick Start
+
+To start a basic security audit, simply run:
+
+```bash
 ./nexharden audit
+```
 
-# Full audit with all modules
+This command performs an initial security assessment of your Linux system.
+
+For a more comprehensive audit, run:
+
+```bash
 sudo ./nexharden audit --full
+```
 
-# Specific module
-./nexharden audit --module ssh
+Once the audit is complete, a security report will be generated.
 
-# Preview hardening (dry-run)
+## 📊 Viewing Reports
+
+All generated reports are stored in the `reports` directory.
+
+Reports are available in both HTML and JSON formats.
+
+To open an HTML report:
+
+```bash
+xdg-open reports/audit-*.html
+```
+
+If the command above does not work, you can open the report directly using a browser:
+
+```bash
+firefox reports/audit-*.html
+```
+
+Or:
+
+```bash
+google-chrome reports/audit-*.html
+```
+
+### What If the Report Does Not Open?
+
+If you encounter an `ERR_ACCESS_DENIED` error, the issue may be related to file permissions.
+
+First, fix the ownership of the reports directory:
+
+```bash
+sudo chown -R "$USER":"$USER" reports/
+```
+
+Then, set the appropriate read permissions:
+
+```bash
+chmod 644 reports/*.html reports/*.json
+```
+
+Try opening the report again.
+
+**Alternative Method:**
+
+If the problem persists, you can start a simple local web server:
+
+```bash
+cd reports
+python3 -m http.server 8080
+```
+
+Then open the following address in your browser:
+
+```text
+http://localhost:8080
+```
+
+Click on the desired `audit-....html` file to view the report.
+
+To stop the server, press `Ctrl + C`.
+
+---
+
+## 🛠️ Common Commands
+
+| Command | Description |
+|---|---|
+| `./nexharden audit` | Run a basic security audit |
+| `sudo ./nexharden audit --full` | Run a comprehensive security audit |
+| `./nexharden system-info` | Display system information |
+| `./nexharden version` | Display the current version |
+| `./nexharden history` | View previous audit reports |
+
+---
+
+## 🔐 What Is Hardening?
+
+Hardening refers to a set of actions and security configurations designed to reduce potential vulnerabilities and improve overall system security.
+
+In addition to identifying security issues, nexHarden can provide recommendations for improving your system's security configurations.
+
+By default, this feature does not make any changes to your system.
+
+### 1. Preview Proposed Changes (Dry Run)
+
+Before applying any changes, you can preview the expected modifications:
+
+```bash
 sudo ./nexharden harden --profile basic --dry-run
+```
 
-# Apply hardening (interactive confirmation)
+### 2. Apply Changes (Apply)
+
+After reviewing and approving the proposed changes, you can apply them:
+
+```bash
 sudo ./nexharden harden --profile basic --apply
 ```
 
-Reports are written to `reports/`.
+> **Warning:** Always carefully review the Dry Run output before applying changes. Modifying security configurations may affect the functionality of certain services and applications.
 
-## CLI Commands
+---
 
-| Command | Description |
-|---------|-------------|
-| `audit` | Run security audit |
-| `harden --profile NAME` | Preview or apply a profile |
-| `backup list` | List hardening transactions |
-| `rollback --transaction ID` | Restore a previous transaction |
-| `history` | Show past audit summaries |
-| `system-info` | Print detected system details |
-| `version` | Print version |
+## 🧰 Troubleshooting
 
-### Audit options
+### The Program Does Not Start
 
-- `--full` — include all modules
-- `--module ssh,firewall` — run selected modules
-- `--report html,json` — choose output formats
-
-### Hardening options
-
-- `--profile basic|standard|strict`
-- `--dry-run` (default behavior when `--apply` is omitted)
-- `--apply` — perform changes after confirmation
-- `--yes` — skip interactive prompt (still creates backups; does not bypass SSH/firewall safety design)
-
-## Audit Workflow
-
-1. Detect distribution, kernel, firewall, SSH, privileges.
-2. Execute selected modules (read-only).
-3. Classify findings (PASS / FAIL / WARNING / UNKNOWN / N/A).
-4. Compute weighted compliance score (UNKNOWN/N/A excluded).
-5. Write JSON and HTML reports.
-6. Store summary in local history.
-
-## Hardening Workflow
-
-1. Load profile and resolve inheritance.
-2. Compare current values to targets.
-3. Display dry-run plan.
-4. On `--apply`, require explicit confirmation.
-5. Create timestamped transaction backup.
-6. Apply minimal changes (currently runtime sysctl).
-7. Record results and transaction ID.
-8. Re-audit recommended after changes.
-
-**Important:** SSH and firewall rule changes are intentionally **not** auto-applied in 1.0.0. They are audited with recommendations only. Automatic modification of `sshd_config` or firewall policies requires additional recovery guarantees planned for future releases.
-
-## Backup & Rollback
+First, check your Python version:
 
 ```bash
-sudo ./nexharden backup list
-sudo ./nexharden rollback --transaction TRANSACTION_ID
+python3 --version
 ```
 
-Rollback verifies that files still match the post-hardening state before restoring. Unexpected user modifications cause the restore to be refused.
+If Python is not installed, install it using:
 
-## Project Structure
-
-```
-nexHarden/
-├── nexharden          # CLI entry point
-├── harden.sh          # Bash launcher
-├── core/              # Engine, scoring, backup, reporter
-├── modules/           # Audit modules
-├── profiles/          # basic, standard, strict
-├── dashboard/         # HTML/CSS/JS template
-├── tests/             # Automated tests
-├── reports/           # Generated reports
-├── backups/           # Transaction backups
-├── history/           # Audit history
-└── docs/
+```bash
+sudo apt update
+sudo apt install python3
 ```
 
-## Scoring Formula
+### Permission Denied
 
+Some security checks require administrative privileges to access system information.
+
+Try running the audit with `sudo`:
+
+```bash
+sudo ./nexharden audit --full
 ```
-Score = (sum of weights of PASS checks) / (sum of weights of PASS + FAIL checks) × 100
+
+### Module Not Found
+
+Make sure you are running the program from its main directory:
+
+```bash
+cd ~/Downloads/nexHarden-1.0.0/nexHarden
 ```
 
-Weights: CRITICAL=10, HIGH=5, MEDIUM=2, LOW=1. WARNING awards 0 points. UNKNOWN and N/A are excluded from the denominator.
+Then try running it again:
 
-## Limitations (1.0.0)
+```bash
+./nexharden audit
+```
 
-- Hardening currently applies **sysctl** settings only.
-- SSH configuration and firewall rules are audited but not automatically modified.
-- PAM changes are not applied automatically.
-- Package upgrades are never performed by the tool.
-- Desktop vs server heuristics are approximate.
-- Not all kernel parameters exist on every kernel; missing ones are marked N/A.
+If the problem persists, save the complete error output for further investigation.
 
-## Security Warnings
+---
 
-- Always review dry-run output before applying.
-- Keep an alternate access path when hardening remote systems.
-- Reports must be treated as sensitive (file permissions 0600).
-- This tool does not replace a full security assessment, intrusion detection, or patch management process.
+## ⚠️ Important Security Notes
 
-## Troubleshooting
+- nexHarden is a security auditing and hardening tool, not a replacement for antivirus software or a firewall.
+- A high security score does not guarantee that your system is completely secure.
+- Always review the Dry Run output before applying changes.
+- Security recommendations may vary depending on your Linux distribution and system configuration.
+- Generated reports may contain sensitive system information. Avoid sharing them publicly.
+- It is recommended to back up important files and configurations before applying significant changes.
 
-| Issue | Suggestion |
-|-------|------------|
-| `sshd -T` fails | Install `openssh-server` or run without SSH module |
-| Incomplete user checks | Re-run with `sudo` |
-| No HTML styling | Ensure `dashboard/` is present next to the CLI |
-| Permission denied on reports | Check directory ownership |
+---
 
-## License
+## 📋 Project Information
 
-MIT License — see `LICENSE`.
+| Specification | Details |
+|---|---|
+| Project Name | nexHarden |
+| Version | 1.0.0 |
+| Programming Language | Python |
+| Operating System | Linux |
+| Minimum Python Version | 3.9 |
+| License | MIT |
 
-## Version
+---
 
-1.0.0
+## 🐧 About Free and Open-Source Software
+
+We believe that security should never be an exclusive feature or something accessible only to a privileged group of people.
+
+Free and open-source software gives everyone the freedom to explore code, learn from it, modify it, and contribute to making it better.
+
+**nexHarden was built with this belief in mind.**
+
+This project is a small contribution toward a world where knowledge is shared freely, tools are accessible to everyone, and security grows through collaboration and community participation.
+
+If you are passionate about Linux, cybersecurity, and open-source software, we invite you to become part of this journey.
+
+**Use freely. Learn openly. Improve together. Share knowledge.**
+
+---
+
+**nexHarden — Security through Knowledge.**
+
+<sub>Built with ❤️ for the Linux & Open Source Community</sub>
