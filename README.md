@@ -197,7 +197,7 @@ sudo ./nexharden audit --full
 Make sure you are running the program from its main directory:
 
 ```bash
-cd ~/Downloads/nexHarden-1.0.0/nexHarden
+cd ~/Downloads/nexHarden-v2/nexHarden
 ```
 
 Then try running it again:
